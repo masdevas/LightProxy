@@ -42,13 +42,16 @@ class Extension {
         
         // Add an icon
         log(`Helo ###`)
+        // let icon = new St.Icon({Gio.icon_new_for_string(Me.path + "/icons/my_icon.png")});
+        log(`Helo2 ###`)
+        log('###'+Me.path + "/icons/my_icon.png")
         log(`${Gio.ThemedIcon.names}`)
         let icon = new St.Icon({
-            gicon: new Gio.ThemedIcon({name: 'network-vpn'}),
+            gicon: Gio.icon_new_for_string(Me.path + "/icons/lproxy.png"),
             style_class: 'system-status-icon'
         });
         this._indicator.add_child(icon);
-
+        log(`Helo3 ###`)
         // `Main.panel` is the actual panel you see at the top of the screen,
         // not a class constructor.
         Main.panel.addToStatusArea(indicatorName, this._indicator);
