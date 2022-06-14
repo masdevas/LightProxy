@@ -54,9 +54,17 @@ class Extension {
         this.setAutoModeToAutoSwitch();
     }
 
-    // setActualModeToSetting() {
-    //     const actual_mode = 
-    // }
+    setSwitchesToSetting() {
+        const auto_state = this.autoProxySwitch._switch.state
+        const enable_state = this.enableProxySwitch._switch.state
+        if (auto_state && enable_state) {
+            this.proxySetting.set_string('mode', 'auto')
+        } else if (enable_state) {
+            this.proxySetting.set_string('mode', 'manual')
+        } else {
+            this.proxySetting.set_string('mode', 'none')
+        }
+    }
 
     enable() {
         const extension_this = this
@@ -94,6 +102,11 @@ class Extension {
             extension_this.setAutoModeToAutoSwitch()
         }
         this.proxySetting.connect("changed", set_auto_mode_to_auto_switch_handler)
+        var auto_switch_to_setting_func = function() {
+            log("# Auto switch toggled");
+            extension_this.setSwitchesToSetting()
+        }
+        this.autoProxySwitch.connect("toggled", auto_switch_to_setting_func)
 
         /* Enable proxy switch configuration */
         this.enableProxySwitch = new PopupMenu.PopupSwitchMenuItem(
@@ -106,12 +119,11 @@ class Extension {
             extension_this.setEnableModeToEnableSwitch()
         }
         this.proxySetting.connect("changed", setting_to_switch_func);
-        
-        // var switch_to_setting_func = function() {
-        //     log("# Enable switch toggled");
-        //     extension_this.setActualModeToSetting()
-        // }
-        // this.enableProxySwitch.connect("toggled", switch_to_setting_func)
+        var enable_switch_to_setting_func = function() {
+            log("# Enable switch toggled");
+            extension_this.setSwitchesToSetting()
+        }
+        this.enableProxySwitch.connect("toggled", enable_switch_to_setting_func)
 
         //this.checkBoxAutoProxy = new CheckBox.CheckBox('label')
         // log(Object.keys(this.switchProxyEnabledItem))
