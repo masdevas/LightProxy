@@ -1,8 +1,8 @@
-To build container:
+To build image:
 
 docker build -t lightproxy-server-tinyproxy .
 
-To download container:
+To download image:
 
 docker pull masdevas/lightproxy-server-tinyproxy
 
