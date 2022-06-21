@@ -2,10 +2,12 @@ To build container:
 
 docker build -t lightproxy-server-tinyproxy .
 
+
+
 To start container:
 
-docker create --name clp -p3001:8888 lightproxy-server-tinyproxy
+Please create /home/lightproxy-server directory on your host. Put config.json and users.json files there - examples of these files you can obtain in parent directory of this folder in the repo.
 
-docker cp users.txt clp:/home/tinyproxy
+docker-compose -f \<path_to_compose_yaml\> up
 
-docker start -a -i clp
+Example of yaml file you can find in this directory.
