@@ -13,15 +13,6 @@ def upgrade_with_configs(proxy_config_lines, config, users):
                 raise Exception(f'Port value isn`t a digit: {port}')
             result_line = re.sub(r'[0-9]+', str(port), line)
             proxy_config_lines[line_idx] = result_line
-        elif re.search(r'ConnectPort [0-9]+$', line):
-            connect_ports = config['connect_method_ports']
-            while line_idx < len(proxy_config_lines) and re.search(r'ConnectPort [0-9]+$', proxy_config_lines[line_idx]):
-                del proxy_config_lines[line_idx]
-            for connect_port in connect_ports:
-                str_connect_port = str(connect_port)
-                if not str_connect_port.isdigit():
-                    raise Exception(f'Port value isn`t a digit: {port}')
-                proxy_config_lines.insert(line_idx, f'ConnectPort {str_connect_port}')
         elif re.search(r'Allow '+ipv4_mask, line) or re.search(r'Allow '+ipv6_mask, line):
             allowed_ips = config['allowed_ips']
             while line_idx < len(proxy_config_lines):
