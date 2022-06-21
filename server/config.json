@@ -1,0 +1,5 @@
+{
+	"port" : 8888,
+	"connect_method_ports" : [0],
+	"allowed_ips" : "all"
+}

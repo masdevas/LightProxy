@@ -1,0 +1,8 @@
+version: '3.3'
+services:
+  lightproxy-server-tinyproxy:
+    image: lightproxy-server-tinyproxy
+    ports:
+      - 3002:8888
+    volumes:
+      - /home/lightproxy-server:/home/lightproxy-server
