@@ -20,6 +20,7 @@
 
 const St = imports.gi.St;
 const Gio = imports.gi.Gio;
+const Json = imports.gi.Json;
 const Gtk = imports.gi.Gtk;
 const GLib = imports.gi.GLib;
 var Clutter = imports.gi.Clutter;
@@ -70,7 +71,6 @@ class Extension {
     }
 
     enable() {
-        dwr
         const extension_this = this
         log(`enabling ${Me.metadata.name}`);
 
@@ -82,7 +82,7 @@ class Extension {
         // Add an icon
         // let icon = new St.Icon({Gio.icon_new_for_string(Me.path + "/icons/my_icon.png")});
         let icon = new St.Icon({
-            gicon: Gio.icon_new_for_string(Me.path + "/icons/lproxy.png"),
+            gicon: Gio.icon_new_for_string(Me.path + "/icons/icon.png"),
             style_class: 'system-status-icon'
         });
         this._indicator.add_child(icon);
@@ -92,46 +92,174 @@ class Extension {
         Main.panel.addToStatusArea(indicatorName, this._indicator);
 
         let dndMenu = this._indicator.menu;
-        for (let key in dndMenu) {
-            log(`@@@ ${key}`)
-        }
 
         this.proxySetting = new Gio.Settings({ schema: 'org.gnome.system.proxy' });
         
-        /* Auto switch configuration */
-        this.autoProxySwitch = new PopupMenu.PopupSwitchMenuItem(
-            "Auto",
-            false,
-        );
-        this.setAutoModeToAutoSwitch()
-        var set_auto_mode_to_auto_switch_handler = function() {
-            log("# Auto mode changed");
-            extension_this.setAutoModeToAutoSwitch()
-        }
-        this.proxySetting.connect("changed", set_auto_mode_to_auto_switch_handler)
-        var auto_switch_to_setting_func = function() {
-            log("# Auto switch toggled");
-            extension_this.setSwitchesToSetting()
-        }
-        this.autoProxySwitch.connect("toggled", auto_switch_to_setting_func)
+        // /* Auto switch configuration */
+        // this.autoProxySwitch = new PopupMenu.PopupSwitchMenuItem(
+        //     "Auto",
+        //     false,
+        // );
+        // this.setAutoModeToAutoSwitch()
+        // var set_auto_mode_to_auto_switch_handler = function() {
+        //     log("# Auto mode changed");
+        //     extension_this.setAutoModeToAutoSwitch()
+        // }
+        // this.proxySetting.connect("changed", set_auto_mode_to_auto_switch_handler)
+        // var auto_switch_to_setting_func = function() {
+        //     log("# Auto switch toggled");
+        //     extension_this.setSwitchesToSetting()
+        // }
+        // this.autoProxySwitch.connect("toggled", auto_switch_to_setting_func)
 
-        /* Enable proxy switch configuration */
-        this.enableProxySwitch = new PopupMenu.PopupSwitchMenuItem(
-            "Enable Proxy",
-            false,
-        );
-        this.setEnableModeToEnableSwitch()
-        var setting_to_switch_func = function() {
-            log("# Proxy mode changed");
-            extension_this.setEnableModeToEnableSwitch()
-        }
-        this.proxySetting.connect("changed", setting_to_switch_func);
-        var enable_switch_to_setting_func = function() {
-            log("# Enable switch toggled");
-            extension_this.setSwitchesToSetting()
-        }
-        this.enableProxySwitch.connect("toggled", enable_switch_to_setting_func)
-        // this.menu_info = new PopupMenu.PopupBaseMenuItem({reactive: false});
+        //  Enable proxy switch configuration 
+        // log('EEE')
+        // this.enableProxySwitch = new PopupMenu.PopupSwitchMenuItem(
+        //     "Enable Proxy",
+        //     false
+        // );
+        // log('RRR')
+        // this.setEnableModeToEnableSwitch()
+        // var setting_to_switch_func = function() {
+        //     log("# Proxy mode changed");
+        //     extension_this.setEnableModeToEnableSwitch()
+        // }
+        // this.proxySetting.connect("changed", setting_to_switch_func);
+        // var enable_switch_to_setting_func = function() {
+        //     log("# Enable switch toggled");
+        //     extension_this.setSwitchesToSetting()
+        // }
+        // this.enableProxySwitch.connect("toggled", enable_switch_to_setting_func)
+        
+        //config = Json.Parser().load_from_file(Me.path + "/settings.json")
+
+        this.menu_info = new PopupMenu.PopupBaseMenuItem({
+            style_class : 'menu',
+            reactive: false
+        });
+        // this.menu_info.set_width('500px')
+        // this.service_logo = new St.Icon({
+        //     gicon: Gio.icon_new_for_string(Me.path + "/icons/logo.png"),
+        //     style_class: 'logo'
+        // });
+        
+        /* Add logo */
+        this.service_logo_box = new St.BoxLayout({
+                x_expand: true,
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER
+        });
+        let icon_file = Me.path + "/icons/logo.png";
+        this.logo_image = St.TextureCache.get_default().load_file_async(Gio.file_new_for_path(icon_file), 350, 350, 1, 1);
+        this.logo_image.set_x_expand(true);
+        this.logo_image.set_x_align(Clutter.ActorAlign.CENTER)
+        this.logo_image.set_y_align(Clutter.ActorAlign.CENTER)
+        this.service_logo_box.add(this.logo_image)
+
+        /* Add enable button */
+        this.enable_button = new St.Button({
+            label: 'Enable',
+            style_class : 'button',
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER
+        });
+
+        /* Add speedtest */
+        this.speedtest_box = new St.BoxLayout({
+                x_expand: true,
+        });
+        this.speedtest_widget = new St.Widget({
+                reactive : false,
+                layout_manager: new Clutter.GridLayout({
+                    orientation: Clutter.Orientation.VERTICAL
+                }),
+                x_expand: true,
+        });
+        this.speedtest_box.add(this.speedtest_widget)
+        this.speedtest_widget_layout = this.speedtest_widget.layout_manager;
+        this.speedtest_widget_layout.attach(
+                new St.Label({
+                    text: 'Up',
+                    style_class : 'text',
+                    x_expand: true,
+                    x_align: Clutter.ActorAlign.CENTER,
+                }), 0, 0, 1, 1);
+        this.speedtest_widget_layout.attach(
+                new St.Label({
+                    text: 'Down',
+                    style_class : 'text',
+                    x_expand: true,
+                    x_align: Clutter.ActorAlign.CENTER,
+                }), 1, 0, 1, 1);
+        this.speedtest_widget_layout.attach(
+                new St.Label({
+                    text: 'TODOUP',
+                    style_class : 'text',
+                    x_expand: true,
+                    x_align: Clutter.ActorAlign.CENTER,
+                }), 0, 1, 1, 1);
+        this.speedtest_widget_layout.attach(
+                new St.Label({
+                    text: 'TODODown',
+                    style_class : 'text',
+                    x_expand: true,
+                    x_align: Clutter.ActorAlign.CENTER,
+                }), 1, 1, 1, 1);
+
+        /* Add settings */
+        this.settings_box = new St.BoxLayout({
+                x_expand: true,
+        });
+        this.settings_button = new St.Button({
+            label: 'Settings',
+            style_class : 'button',
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER
+        });
+        this.settings_button.connect('clicked', (self) => {
+            log(`@@ CLICKED`)
+            extension_this.application = new Gtk.Application();
+        });
+        this.settings_box.add(this.settings_button)
+        // this.service_logo_widget = new St.Widget({
+        //     reactive : false,
+        //     layout_manager: new Clutter.GridLayout({
+        //         orientation: Clutter.Orientation.VERTICAL
+        //     })
+        // });
+        // let icon_file = Me.path + "/icons/logo.png";
+        // let file = Gio.file_new_for_path(icon_file);
+        // let icon_uri = file.get_uri();
+        // this.service_logo_layout = this.service_logo_widget.layout_manager;
+        // this.service_logo_layout.attach(
+        //     St.TextureCache.get_default().load_file_async(Gio.file_new_for_path(icon_file), 128, 128, 1, 1), 0, 0, 1, 1
+        // )
+
+        // this.service_logo_box.add(this.service_logo_widget)
+        // // this.service_logo_holder.add(this.service_logo)
+        // for (let key in this.service_logo) {
+        //     log(`@@@ ${key}`)
+        // }
+        
+        /* Create overall widget */
+        this.overall_widget = new St.Widget({
+                reactive : false,
+                layout_manager: new Clutter.GridLayout({
+                    orientation: Clutter.Orientation.VERTICAL
+                }),
+                x_expand: true,
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER
+        });
+        this.overall_widget_layout = this.overall_widget.layout_manager;
+        this.overall_widget_layout.attach(this.service_logo_box, 0, 0, 1, 1)
+        this.overall_widget_layout.attach(this.enable_button, 0, 1, 1, 1)
+        this.overall_widget_layout.attach(this.speedtest_box, 0, 2, 1, 1)
+        this.overall_widget_layout.attach(this.settings_box, 0, 3, 1, 1)
+
+        /* Add overall wigdet */
+        this.menu_info.add(this.overall_widget)
+
         // this.menu_info_box = new St.BoxLayout();
         
         // // let a = new Clutter.GridLayout({
@@ -255,8 +383,8 @@ class Extension {
         //     tray_menu._getMenuItems()[0].actor.get_last_child().add_child(menu_info_box_table);
         // }
         
-        this.menu_info_box.add(this.menu_info_box_table);
-        this.menu_info.add(this.menu_info_box);
+        // this.menu_info_box.add(this.menu_info_box_table);
+        // this.menu_info.add(this.menu_info_box);
 
 
         //this.checkBoxAutoProxy = new CheckBox.CheckBox('label')
@@ -281,8 +409,8 @@ class Extension {
         log(this.proxySettingHttp.get_string('host'))
         log(this.proxySettingHttp.get_int('port')) */
         // this.switchProxyEnabledItem.setSensitive(false)
-        dndMenu.addMenuItem(this.autoProxySwitch);
-        dndMenu.addMenuItem(this.enableProxySwitch);
+        // dndMenu.addMenuItem(this.autoProxySwitch);
+        // dndMenu.addMenuItem(this.enableProxySwitch);
         dndMenu.addMenuItem(this.menu_info);
         // dndMenu.add_child(this.checkBoxAutoProxy);
         // this.switchProxyEnabledItem.disable();
