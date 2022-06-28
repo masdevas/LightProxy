@@ -20,6 +20,9 @@
 
 const St = imports.gi.St;
 const Gio = imports.gi.Gio;
+const Gtk = imports.gi.Gtk;
+const GLib = imports.gi.GLib;
+var Clutter = imports.gi.Clutter;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -88,6 +91,9 @@ class Extension {
         Main.panel.addToStatusArea(indicatorName, this._indicator);
 
         let dndMenu = this._indicator.menu;
+        for (let key in dndMenu) {
+            log(`@@@ ${key}`)
+        }
 
         this.proxySetting = new Gio.Settings({ schema: 'org.gnome.system.proxy' });
         
@@ -124,6 +130,132 @@ class Extension {
             extension_this.setSwitchesToSetting()
         }
         this.enableProxySwitch.connect("toggled", enable_switch_to_setting_func)
+        this.menu_info = new PopupMenu.PopupBaseMenuItem({reactive: false});
+        this.menu_info_box = new St.BoxLayout();
+        
+        // let a = new Clutter.GridLayout({
+        //     orientation: Clutter.Orientation.VERTICAL
+        // })
+        // for (var key in a) {
+        //     let b = typeof key
+        //     log(`### ${key} ${b}`)
+            
+        // }
+
+        this.menu_info_box_table = new St.Widget({
+            style: 'width: 500px; height: 500px; background-color: brown;padding: 10px 0px 10px 0px; spacing-rows: 10px; spacing-columns: 15px;',
+            layout_manager: new Clutter.GridLayout({
+                orientation: Clutter.Orientation.VERTICAL
+            })
+        });
+
+        this.menu_info_box_table_layout = this.menu_info_box_table.layout_manager;
+
+        this.menu_info_box_table_layout.attach(
+                new St.Icon({
+                    gicon: Gio.icon_new_for_string(Me.path + "/icons/lproxy.png"),
+                    style_class : 'sm-label',
+                }), 0, 0, 1, 1);
+        this.menu_info_box_table_layout.attach(
+                new St.DrawingArea({
+                    style_class : 'sm-label',
+                    reactive : true,
+                    can_focus : true,
+                    track_hover : true,
+                    width: 10,
+                    height: 10
+                }), 1, 0, 1, 1);
+        this.menu_info_box_table_layout.attach(
+                new St.Entry({
+                    text: 'hello2',
+                    style_class : 'sm-label',
+                    x_align: Clutter.ActorAlign.START,
+                    y_align: Clutter.ActorAlign.CENTER
+                }), 0, 1, 1, 1);
+        this.tmp_label = new St.Label({
+                    text: 'world2',
+                    style_class : 'sm-label',
+                    x_align: Clutter.ActorAlign.START,
+                    y_align: Clutter.ActorAlign.CENTER
+                })
+        this.menu_info_box_table_layout.attach(
+                this.tmp_label, 1, 1, 1, 1);
+        this.setInterval = function setInterval(func, delay, ...args) {
+            const wrappedFunc = () => {
+                return func.apply(this, args) || true;
+            };
+            return GLib.timeout_add(GLib.PRIORITY_DEFAULT, delay, wrappedFunc);
+        }
+        this.intervalId = this.setInterval(function() {
+            // alert("Interval reached every 5s")
+            var currentdate = new Date(); 
+            var datetime = "Last Sync: "
+                + currentdate.getSeconds();
+            extension_this.tmp_label.set_text(datetime)
+        }, 1);
+        this.menu_info_box_table_layout.attach(
+                new St.PasswordEntry({
+                    text: 'hello2',
+                    style_class : 'sm-label',
+                    x_align: Clutter.ActorAlign.START,
+                    y_align: Clutter.ActorAlign.CENTER
+                }), 0, 2, 1, 1);
+        this.gtk_button = new St.Button({
+                    label: 'hello2',
+                    style_class : 'sm-label',
+                    x_align: Clutter.ActorAlign.START,
+                    y_align: Clutter.ActorAlign.CENTER
+                })
+        this.menu_info_box_table_layout.attach(
+                this.gtk_button, 1, 2, 1, 1);
+        this.application = new Gtk.Application({
+            application_id: 'org.gnome.Sandbox.ImageViewerExample',
+            flags: Gio.ApplicationFlags.FLAGS_NONE
+        });
+
+        this._window = new Gtk.ApplicationWindow({
+            application: this._app,
+            defaultHeight: 600,
+            defaultWidth: 800
+        });
+        this.gtk_button.connect('clicked', (self) => {
+            //extension_this._window.present();
+        })
+
+        // for (let elt in elts) {
+        //     if (!elts[elt].menu_visible) {
+        //         continue;
+        //     }
+
+        //     // Add item name to table
+        //     menu_info_box_table_layout.attach(
+        //         new St.Label({
+        //             text: elts[elt].item_name,
+        //             style_class: Style.get('sm-title'),
+        //             x_align: Clutter.ActorAlign.START,
+        //             y_align: Clutter.ActorAlign.CENTER
+        //         }), 0, row_index, 1, 1);
+
+        //     // Add item data to table
+        //     let col_index = 1;
+        //     for (let item in elts[elt].menu_items) {
+        //         menu_info_box_table_layout.attach(
+        //             elts[elt].menu_items[item], col_index, row_index, 1, 1);
+
+        //         col_index++;
+        //     }
+
+        //     row_index++;
+        // }
+        // if (shell_Version < '3.36') {
+        //     tray_menu._getMenuItems()[0].actor.get_last_child().add(menu_info_box_table, {expand: true});
+        // } else {
+        //     tray_menu._getMenuItems()[0].actor.get_last_child().add_child(menu_info_box_table);
+        // }
+        
+        this.menu_info_box.add(this.menu_info_box_table);
+        this.menu_info.add(this.menu_info_box);
+
 
         //this.checkBoxAutoProxy = new CheckBox.CheckBox('label')
         // log(Object.keys(this.switchProxyEnabledItem))
@@ -149,10 +281,12 @@ class Extension {
         // this.switchProxyEnabledItem.setSensitive(false)
         dndMenu.addMenuItem(this.autoProxySwitch);
         dndMenu.addMenuItem(this.enableProxySwitch);
+        dndMenu.addMenuItem(this.menu_info);
         // dndMenu.add_child(this.checkBoxAutoProxy);
         // this.switchProxyEnabledItem.disable();
         // log(Object.keys(this.switchProxyEnabledItem))
         // this.switchProxyEnabledItem._active = false
+        log(`enabled ${Me.metadata.name}`);
     }
     
     // REMINDER: It's required for extensions to clean up after themselves when

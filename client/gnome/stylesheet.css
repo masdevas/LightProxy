@@ -1,1 +1,13 @@
 /* Add your custom extension styling here */
+.sm-label {
+    background-color: #d2d1d0;
+    font-size: 0.75em;
+    padding-top: 5px;
+    width:  200px;
+    height:  200px;
+    font-family: monospace;
+}
+
+.grid {
+	background-size: 100% 100%;
+}
