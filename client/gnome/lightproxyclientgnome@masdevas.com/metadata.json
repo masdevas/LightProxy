@@ -1,0 +1,8 @@
+{
+  "name": "LightProxy",
+  "description": "LightProxy Gnome client app.",
+  "uuid": "lightproxyclientgnome@masdevas.com",
+  "shell-version": [
+    "42"
+  ]
+}

@@ -70,6 +70,7 @@ class Extension {
     }
 
     enable() {
+        dwr
         const extension_this = this
         log(`enabling ${Me.metadata.name}`);
 
@@ -130,97 +131,98 @@ class Extension {
             extension_this.setSwitchesToSetting()
         }
         this.enableProxySwitch.connect("toggled", enable_switch_to_setting_func)
-        this.menu_info = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        this.menu_info_box = new St.BoxLayout();
+        // this.menu_info = new PopupMenu.PopupBaseMenuItem({reactive: false});
+        // this.menu_info_box = new St.BoxLayout();
         
-        // let a = new Clutter.GridLayout({
-        //     orientation: Clutter.Orientation.VERTICAL
-        // })
-        // for (var key in a) {
-        //     let b = typeof key
-        //     log(`### ${key} ${b}`)
+        // // let a = new Clutter.GridLayout({
+        // //     orientation: Clutter.Orientation.VERTICAL
+        // // })
+        // // for (var key in a) {
+        // //     let b = typeof key
+        // //     log(`### ${key} ${b}`)
             
+        // // }
+
+        // this.menu_info_box_table = new St.Widget({
+        //     style: 'width: 500px; height: 500px; background-color: brown;padding: 10px 0px 10px 0px; spacing-rows: 10px; spacing-columns: 15px;',
+        //     layout_manager: new Clutter.GridLayout({
+        //         orientation: Clutter.Orientation.VERTICAL
+        //     })
+        // });
+
+        // this.menu_info_box_table_layout = this.menu_info_box_table.layout_manager;
+
+        // this.menu_info_box_table_layout.attach(
+        //         new St.Icon({
+        //             gicon: Gio.icon_new_for_string(Me.path + "/icons/lproxy.png"),
+        //             style_class : 'sm-label',
+        //         }), 0, 0, 1, 1);
+        // this.menu_info_box_table_layout.attach(
+        //         new St.DrawingArea({
+        //             style_class : 'sm-label',
+        //             reactive : true,
+        //             can_focus : true,
+        //             track_hover : true,
+        //             width: 10,
+        //             height: 10
+        //         }), 1, 0, 1, 1);
+        // this.menu_info_box_table_layout.attach(
+        //         new St.Entry({
+        //             text: 'hello2',
+        //             style_class : 'sm-label',
+        //             x_align: Clutter.ActorAlign.START,
+        //             y_align: Clutter.ActorAlign.CENTER
+        //         }), 0, 1, 1, 1);
+        // this.tmp_label = new St.Label({
+        //             text: 'world2',
+        //             style_class : 'sm-label',
+        //             x_align: Clutter.ActorAlign.START,
+        //             y_align: Clutter.ActorAlign.CENTER
+        //         })
+        // this.menu_info_box_table_layout.attach(
+        //         this.tmp_label, 1, 1, 1, 1);
+        // this.setInterval = function setInterval(func, delay, ...args) {
+        //     const wrappedFunc = () => {
+        //         return func.apply(this, args) || true;
+        //     };
+        //     return GLib.timeout_add(GLib.PRIORITY_DEFAULT, delay, wrappedFunc);
         // }
+        // this.intervalId = this.setInterval(function() {
+        //     // alert("Interval reached every 5s")
+        //     var currentdate = new Date(); 
+        //     var datetime = "Last Sync: "
+        //         + currentdate.getSeconds();
+        //     extension_this.tmp_label.set_text(datetime)
+        // }, 1);
+        // this.menu_info_box_table_layout.attach(
+        //         new St.PasswordEntry({
+        //             text: 'hello2',
+        //             style_class : 'sm-label',
+        //             x_align: Clutter.ActorAlign.START,
+        //             y_align: Clutter.ActorAlign.CENTER
+        //         }), 0, 2, 1, 1);
+        // this.gtk_button = new St.Button({
+        //             label: 'hello2',
+        //             style_class : 'sm-label',
+        //             x_align: Clutter.ActorAlign.START,
+        //             y_align: Clutter.ActorAlign.CENTER
+        //         })
+        // this.menu_info_box_table_layout.attach(
+        //         this.gtk_button, 1, 2, 1, 1);
+        // this.application = new Gtk.Application({
+        //     application_id: 'org.gnome.Sandbox.ImageViewerExample',
+        //     flags: Gio.ApplicationFlags.FLAGS_NONE
+        // });
 
-        this.menu_info_box_table = new St.Widget({
-            style: 'width: 500px; height: 500px; background-color: brown;padding: 10px 0px 10px 0px; spacing-rows: 10px; spacing-columns: 15px;',
-            layout_manager: new Clutter.GridLayout({
-                orientation: Clutter.Orientation.VERTICAL
-            })
-        });
-
-        this.menu_info_box_table_layout = this.menu_info_box_table.layout_manager;
-
-        this.menu_info_box_table_layout.attach(
-                new St.Icon({
-                    gicon: Gio.icon_new_for_string(Me.path + "/icons/lproxy.png"),
-                    style_class : 'sm-label',
-                }), 0, 0, 1, 1);
-        this.menu_info_box_table_layout.attach(
-                new St.DrawingArea({
-                    style_class : 'sm-label',
-                    reactive : true,
-                    can_focus : true,
-                    track_hover : true,
-                    width: 10,
-                    height: 10
-                }), 1, 0, 1, 1);
-        this.menu_info_box_table_layout.attach(
-                new St.Entry({
-                    text: 'hello2',
-                    style_class : 'sm-label',
-                    x_align: Clutter.ActorAlign.START,
-                    y_align: Clutter.ActorAlign.CENTER
-                }), 0, 1, 1, 1);
-        this.tmp_label = new St.Label({
-                    text: 'world2',
-                    style_class : 'sm-label',
-                    x_align: Clutter.ActorAlign.START,
-                    y_align: Clutter.ActorAlign.CENTER
-                })
-        this.menu_info_box_table_layout.attach(
-                this.tmp_label, 1, 1, 1, 1);
-        this.setInterval = function setInterval(func, delay, ...args) {
-            const wrappedFunc = () => {
-                return func.apply(this, args) || true;
-            };
-            return GLib.timeout_add(GLib.PRIORITY_DEFAULT, delay, wrappedFunc);
-        }
-        this.intervalId = this.setInterval(function() {
-            // alert("Interval reached every 5s")
-            var currentdate = new Date(); 
-            var datetime = "Last Sync: "
-                + currentdate.getSeconds();
-            extension_this.tmp_label.set_text(datetime)
-        }, 1);
-        this.menu_info_box_table_layout.attach(
-                new St.PasswordEntry({
-                    text: 'hello2',
-                    style_class : 'sm-label',
-                    x_align: Clutter.ActorAlign.START,
-                    y_align: Clutter.ActorAlign.CENTER
-                }), 0, 2, 1, 1);
-        this.gtk_button = new St.Button({
-                    label: 'hello2',
-                    style_class : 'sm-label',
-                    x_align: Clutter.ActorAlign.START,
-                    y_align: Clutter.ActorAlign.CENTER
-                })
-        this.menu_info_box_table_layout.attach(
-                this.gtk_button, 1, 2, 1, 1);
-        this.application = new Gtk.Application({
-            application_id: 'org.gnome.Sandbox.ImageViewerExample',
-            flags: Gio.ApplicationFlags.FLAGS_NONE
-        });
-
-        this._window = new Gtk.ApplicationWindow({
-            application: this._app,
-            defaultHeight: 600,
-            defaultWidth: 800
-        });
-        this.gtk_button.connect('clicked', (self) => {
-            //extension_this._window.present();
-        })
+        // this._window = new Gtk.ApplicationWindow({
+        //     application: this._app,
+        //     defaultHeight: 600,
+        //     defaultWidth: 800
+        // });
+        // this.gtk_button.connect('clicked', (self) => {
+        //     log(`@@ CLICKED`)
+        //     //extension_this._window.present();
+        // })
 
         // for (let elt in elts) {
         //     if (!elts[elt].menu_visible) {
